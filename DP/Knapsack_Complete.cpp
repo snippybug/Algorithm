@@ -1,5 +1,8 @@
 /*
  * 放宽条件：每种物品有无限件可以用
+ *
+ * 参考《背包九讲V2》
+ *
  * Author:	Wang Zonglei
  * Date:	2015.7.9
  * 
@@ -12,11 +15,14 @@
 
 #include <cassert>
 #include <iostream>
-#include <queue>
 #include <vector>
-#include <functional>
 
 using namespace std;
+
+inline int max(int a, int b){
+	return a > b ? a : b;
+}
+
 
 int selectItems(const int *W, const int *C, int **rW, int **rC, const int N);
 int cloneItems(const int *W, const int *C, int **rW, int **rC, const int N, const int V);
@@ -67,17 +73,8 @@ int main(){
 
 	int row = 0;
 	while (row < N2){
-		for (int j = V; j >= 0; j--){				// 必须为逆序，因为计算依靠左上的状态
-			int value;
-			// 对于不同重量的背包，考虑是否放入物品i
-			// 如果不能放入，则F[row][j]=F[row-1][j]
-			if (j < W2[row]){
-				value = F[j];
-			}
-			else{		// 能放入时，取放入和不放入的较大值
-				value = max(F[j], F[j - W2[row]] + C2[row]);
-			}
-			F[j] = value;
+		for (int j = V; j >= W2[row]; j--){				// 必须为逆序，因为计算依靠左上的状态
+			F[j] = max(F[j], F[j - W2[row]] + C2[row]);
 		}
 		++row;
 	}

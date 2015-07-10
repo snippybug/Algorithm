@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 using namespace std;
 
@@ -99,16 +100,24 @@ int cloneItems(const int *W, const int *C, const int *M, int **rW, int **rC, con
 		else{
 			upper = M[i] + 1;
 		}
-		while ((W[i] << n) < upper){
+		while ((1 << n) < upper){
 			++n;
 		}
-		for (int j = 0; j < n; j++){
+		if (n>0){					
+			--n;					// 求上限
+		}
+		else{						// 如果n==0，说明M[i]=0，不允许放入物品
+			continue;
+		}
+		int j = 0;
+		while (j < n){
 			items.push_back(Item(W[i] << j, C[i] << j));
+			j++;
 		}
 		int temp;
-		if ((temp = upper - (1 << (n-1))) != 0){				// 不等于0说明M[i]不能完全被前k个数表示
-			items.push_back(Item(W[i] * temp, C[i] * temp));
-		}
+		temp = upper - (1 << n);
+		assert(temp>0);
+		items.push_back(Item(W[i] * temp, C[i] * temp));
 	}
 	int nRem = items.size();
 	int *tW, *tC;
