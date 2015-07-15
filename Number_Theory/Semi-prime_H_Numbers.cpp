@@ -19,6 +19,7 @@
  */
 
 #include <vector>
+#include <cstdio>
 
 using namespace std;
 
@@ -28,32 +29,48 @@ using namespace std;
 // 外层循环运行到6时，*2后筛出。这样得到的算法是一个线性的算法
 int main(){
 	int N;			// H数的上界
-	N = 21;
-	vector<int> prime;			// 质数表
-	int count = 0;			// H半质数的个数(程序目标)
-	int *state;				// state[i]=0说明i未被扫描，1说明是质数，2说明是合数
+	while (1){
+		scanf("%d", &N);
+		if (N == 0){
+			break;
+		}
+		vector<int> prime;			// 质数表
+		int count = 0;			// H半质数的个数(程序目标)
+		int *state;				// state[i]=0说明i未被扫描，1说明是质数，2说明是合数
 
-	state = new int[(N - 1) / 4 + 1];		// state[0]是冗余位，因为0*4+1=1是特殊数字
+		state = new int[(N - 1) / 4 + 1];		// state[0]是冗余位，因为0*4+1=1是特殊数字
 
-	// 初始化isP
-	for (int i = 0; i <= (N - 1) / 4; i++){
-		state[i] = 0;
-	}
-
-	for (int i = 1; i <= (N - 1) / 4; i++){
-		int num = i * 4 + 1;		// 序号i对应的质数
-		if (state[i] == 0){		// 发现质数
-			state[i] = 1;
-			prime.push_back(num);
+		// 初始化state
+		for (int i = 0; i <= (N - 1) / 4; i++){
+			state[i] = 0;
+		}
+		prime.reserve(1000000);
+		for (int i = 1; i <= (N - 1) / 4; i++){
+			int num = i * 4 + 1;		// 序号i对应的H数
+			if (state[i] == 0){		// 发现质数
+				state[i] = 1;
+				prime.push_back(num);
+			}
 			for (vector<int>::iterator it = prime.begin(); it != prime.end(); it++){
-				// 如果乘积在给定范围内
-				if (*it * num <= N){
-
+				if (*it * num <= N){				// 如果乘积在给定范围内
+					if (state[(*it - 1) / 4] == 1
+						&& state[i] == 1
+						){		// 如果两个数都是质数，说明乘积是半质数
+						//printf("%d=%d*%d\n", *it*num, *it, num);
+						++count;
+					}
+					state[(*it*num - 1) / 4] = 2;
+					if (num%*it == 0)	break;
+				}
+				else{								// 向量里的数组是升序排列de
+					break;
 				}
 			}
 		}
-	}
 
-	delete state;
+		printf("%d %d\n", N, count);
+
+		delete state;
+	}
 	return 0;
 }
